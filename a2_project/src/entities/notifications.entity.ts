@@ -6,7 +6,7 @@ export type NotificationsDocument = HydratedDocument<NotificationsEntity>;
 @Schema()
 export class NotificationsEntity {
 
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'UserEntity'})
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Users'})
     user: UserEntity
 
     @Prop()

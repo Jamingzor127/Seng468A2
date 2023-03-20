@@ -24,24 +24,24 @@ export class AppController {
     return this.appService.createUser(user);
   }
 
-  @Delete('User/:id')
-  deleteUser(@Param('id') id: string): Promise<boolean> {
-    return this.appService.deleteUser(id);
+  @Delete('User/:username')
+  deleteUser(@Param('username') username: string): Promise<boolean> {
+    return this.appService.deleteUser(username);
   }
 
-  @Patch('AddFriend/:id/:friendId')
-  addFriend(@Param('id') id: string, @Param('friendId') friendId: string): Promise<boolean> {
-    return this.appService.addFriend(id, friendId);
+  @Patch('AddFriend/:username/:friendUsername')
+  addFriend(@Param('username') username: string, @Param('friendUsername') friendUsername: string): Promise<boolean> {
+    return this.appService.addFriend(username, friendUsername);
   }
 
-  @Patch('RemoveFriend/:id/:friendId')
-  removeFriend(@Param('id') id: string, @Param('friendId') friendId: string): Promise<boolean> {
-    return this.appService.removeFriend(id, friendId);
+  @Patch('RemoveFriend/:username/:friendUsername')
+  removeFriend(@Param('username') username: string, @Param('friendUsername') friendUsername: string): Promise<boolean> {
+    return this.appService.removeFriend(username, friendUsername);
   }
 
-  @Get('Friends/:id')
-  getFriends(@Param('id') id: string): Promise<UserEntity[]> {
-    return this.appService.getFriends(id);
+  @Get('Friends/:username')
+  getFriends(@Param('username') username: string): Promise<UserEntity[]> {
+    return this.appService.getFriends(username);
   }
 
   @Get('CommentIds')
@@ -51,37 +51,37 @@ export class AppController {
 
   @Post('CreateComment')
   createComment(@Body() comment: createCommentDto): Promise<boolean> {
-    return this.appService.addComment(comment.userId, comment.content, comment.postId);
+    return this.appService.addComment(comment.userName, comment.content, comment.postId);
   }
 
-  @Delete('Comment/:id/:commentId')
-  deleteComment(@Param('id') id: string, @Param('commentId') commentId: string): Promise<boolean> {
-    return this.appService.removeComment(id, commentId);
+  @Delete('Comment/:username/:commentId')
+  deleteComment(@Param('username') username: string, @Param('commentId') commentId: string): Promise<boolean> {
+    return this.appService.removeComment(username, commentId);
   }
 
   @Patch('EditComment')
   editComment(@Body() comment: editCommentDto): Promise<boolean> {
-    return this.appService.editComment(comment.userId, comment.commentId, comment.content);
+    return this.appService.editComment(comment.userName, comment.commentId, comment.content);
   }
 
-  @Patch('LikeComment/:id/:commentId')
-  likeComment(@Param('id') id: string, @Param('commentId') commentId: string): Promise<boolean> {
-    return this.appService.likeComment(id, commentId);
+  @Patch('LikeComment/:username/:commentId')
+  likeComment(@Param('username') username: string, @Param('commentId') commentId: string): Promise<boolean> {
+    return this.appService.likeComment(username, commentId);
   }
 
-  @Patch('UnlikeComment/:id/:commentId')
-  unlikeComment(@Param('id') id: string, @Param('commentId') commentId: string): Promise<boolean> {
-    return this.appService.unlikeComment(id, commentId);
+  @Patch('UnlikeComment/:username/:commentId')
+  unlikeComment(@Param('username') username: string, @Param('commentId') commentId: string): Promise<boolean> {
+    return this.appService.unlikeComment(username, commentId);
   }
 
-  @Get('LikedComments/:id')
-  getLikedComments(@Param('id') id: string): Promise<CommentEntity[]> {
-    return this.appService.getLikedComments(id);
+  @Get('LikedComments/:username')
+  getLikedComments(@Param('username') username: string): Promise<CommentEntity[]> {
+    return this.appService.getLikedComments(username);
   }
 
-  @Get('CommentsForUser/:id')
-  getCommentsForUser(@Param('id') id: string): Promise<CommentEntity[]> {
-    return this.appService.getCommentsForUser(id);
+  @Get('CommentsForUser/:username')
+  getCommentsForUser(@Param('username') username: string): Promise<CommentEntity[]> {
+    return this.appService.getCommentsForUser(username);
   }
 
   @Get('CommentsForPost/:id')
@@ -89,9 +89,9 @@ export class AppController {
     return this.appService.getCommentsForPost(id);
   }
 
-  @Get('CommentsForPostForUser/:id/:postId')
-  getCommentsForPostForUser(@Param('id') id: string, @Param('postId') postId: string): Promise<CommentEntity[]> {
-    return this.appService.getCommentsForPostForUser(id, postId);
+  @Get('CommentsForPostForUser/:username/:postId')
+  getCommentsForPostForUser(@Param('username') username: string, @Param('postId') postId: string): Promise<CommentEntity[]> {
+    return this.appService.getCommentsForPostForUser(username, postId);
   }
 
   @Get('Comment/:commentId')
@@ -106,7 +106,7 @@ export class AppController {
 
   @Post('CreatePost')
   createPost(@Body() post: createPostDto): Promise<boolean> {
-    return this.appService.createPost(post.userId, post.title, post.content);
+    return this.appService.createPost(post.userName, post.title, post.content);
   }
 
   @Delete('Post/:postId')
@@ -125,24 +125,24 @@ export class AppController {
     }
   }
 
-  @Patch('LikePost/:id/:postId')
-  likePost(@Param('id') id: string, @Param('postId') postId: string): Promise<boolean> {
-    return this.appService.likePost(id, postId);
+  @Patch('LikePost/:username/:postId')
+  likePost(@Param('username') username: string, @Param('postId') postId: string): Promise<boolean> {
+    return this.appService.likePost(username, postId);
   }
 
-  @Patch('UnlikePost/:id/:postId')
-  unlikePost(@Param('id') id: string, @Param('postId') postId: string): Promise<boolean> {
-    return this.appService.unlikePost(id, postId);
+  @Patch('UnlikePost/:username/:postId')
+  unlikePost(@Param('username') username: string, @Param('postId') postId: string): Promise<boolean> {
+    return this.appService.unlikePost(username, postId);
   }
 
-  @Get('LikedPosts/:id')
-  getLikedPosts(@Param('id') id: string): Promise<PostEntity[]> {
-    return this.appService.getLikedPosts(id);
+  @Get('LikedPosts/:username')
+  getLikedPosts(@Param('username') username: string): Promise<PostEntity[]> {
+    return this.appService.getLikedPosts(username);
   }
 
-  @Get('PostsForUser/:id')
-  getPostsForUser(@Param('id') id: string): Promise<PostEntity[]> {
-    return this.appService.getPosts(id);
+  @Get('PostsForUser/:username')
+  getPostsForUser(@Param('username') username: string): Promise<PostEntity[]> {
+    return this.appService.getPosts(username);
   }
 
   @Get('Post/:postId')
@@ -150,9 +150,9 @@ export class AppController {
     return this.appService.getPost(postId);
   }
 
-  @Get('UserReports/:id')
-  getUserReports(@Param('id') id: string): Promise<GetUserReportDto> {
-    return this.appService.getUserReports(id);
+  @Get('UserReports/:username')
+  getUserReports(@Param('username') username: string): Promise<GetUserReportDto> {
+    return this.appService.getUserReports(username);
   }
 
 }

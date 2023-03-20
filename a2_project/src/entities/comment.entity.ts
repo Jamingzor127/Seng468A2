@@ -7,10 +7,10 @@ export type CommentDocument = HydratedDocument<CommentEntity>;
 @Schema()
 export class CommentEntity {
     
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'UserEntity'})
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Users'})
     user: UserEntity;
 
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'PostEntity'})
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Posts'})
     post: PostEntity;
     
     @Prop()
@@ -19,7 +19,7 @@ export class CommentEntity {
     @Prop()
     numberOfLikes: number;
 
-    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'UserEntity'}]})
+    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Users'}]})
     usersLiked: UserEntity[];
     
     @Prop()

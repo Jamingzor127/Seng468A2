@@ -8,11 +8,8 @@ export type PostDocument = HydratedDocument<PostEntity>;
 @Schema()
 export class PostEntity {
     
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'UserEntity'})
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Users'})
     user: UserEntity
-
-    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'CommentEntity'}]})
-    comments: CommentEntity[]
 
     @Prop()
     title: string;
@@ -23,7 +20,7 @@ export class PostEntity {
     @Prop()
     numberOfLikes: number;
 
-    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'UserEntity'}]})
+    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Users'}]})
     usersLiked: UserEntity[];
     
     @Prop()

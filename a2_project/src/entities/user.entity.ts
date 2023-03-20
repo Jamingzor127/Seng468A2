@@ -27,7 +27,7 @@ export class UserEntity {
     @Prop()
     dateOfBirth: string;
 
-    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'UserEntity'}]})
+    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Users'}]})
     friendList: UserEntity[];
 
     @Prop()
@@ -35,15 +35,6 @@ export class UserEntity {
 
     @Prop()
     lastUpdateDate: Date;
-
-    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'PostEntity'}]})
-    posts: PostEntity[];
-
-    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'CommentEntity'}]})
-    comments: CommentEntity[];
-
-    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'NotificationsEntity'}]})
-    notifications: NotificationsEntity[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserEntity);

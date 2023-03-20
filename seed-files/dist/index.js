@@ -23,51 +23,49 @@ function main() {
         for (const user of users_json_1.default) {
             yield axios_1.default.post('http://localhost:8000/CreateUser', user);
         }
-        //Get Ids of Users
-        const userIds = (yield axios_1.default.get('http://localhost:8000/UserIds')).data;
         //Assign Friends
         console.log("Assigning Friends...");
-        for (const user of userIds) {
+        for (const user of users_json_1.default) {
             const friends = [];
             for (let i = 0; i < 5; i++) {
-                const friend = userIds[Math.floor(Math.random() * userIds.length)];
-                if (friend !== user && !friends.includes(friend)) {
-                    friends.push(friend);
+                const friend = users_json_1.default[Math.floor(Math.random() * users_json_1.default.length)];
+                if (friend.username !== user.username && !friends.includes(friend.username)) {
+                    friends.push(friend.username);
                 }
             }
             for (const friend of friends) {
-                yield axios_1.default.patch(`http://localhost:8000/AddFriend/${user}/${friend}`);
+                yield axios_1.default.patch(`http://localhost:8000/AddFriend/${user.username}/${friend}`);
             }
             ;
         }
         //Create Posts
         console.log("Creating Posts...");
         for (const post of post_json_1.default) {
-            const userId = userIds[Math.floor(Math.random() * userIds.length)];
-            yield axios_1.default.post(`http://localhost:8000/CreatePost`, Object.assign(Object.assign({}, post), { userId }));
+            const userName = users_json_1.default[Math.floor(Math.random() * users_json_1.default.length)].username;
+            yield axios_1.default.post(`http://localhost:8000/CreatePost`, Object.assign(Object.assign({}, post), { userName }));
         }
         const postIds = (yield axios_1.default.get('http://localhost:8000/PostIds')).data;
         //Create Comments
         console.log("Creating Comments...");
         for (const comment of comment_json_1.default) {
-            const userId = userIds[Math.floor(Math.random() * userIds.length)];
+            const userName = users_json_1.default[Math.floor(Math.random() * users_json_1.default.length)].username;
             const postId = postIds[Math.floor(Math.random() * postIds.length)];
-            yield axios_1.default.post(`http://localhost:8000/CreateComment`, Object.assign(Object.assign({}, comment), { userId, postId }));
+            yield axios_1.default.post(`http://localhost:8000/CreateComment`, Object.assign(Object.assign({}, comment), { userName, postId }));
         }
         const commentIds = (yield axios_1.default.get('http://localhost:8000/CommentIds')).data;
         //Like Posts
         console.log("Liking Posts and Comments...");
         for (const postId of postIds) {
-            for (let i = 0; i < 50; i++) {
-                const userId = userIds[Math.floor(Math.random() * userIds.length)];
-                yield axios_1.default.patch(`http://localhost:8000/LikePost/${userId}/${postId}`);
+            for (let i = 0; i < 2; i++) {
+                const userName = users_json_1.default[Math.floor(Math.random() * users_json_1.default.length)].username;
+                yield axios_1.default.patch(`http://localhost:8000/LikePost/${userName}/${postId}`);
             }
         }
         //Like Comments
         for (const commentId of commentIds) {
-            for (let i = 0; i < 100; i++) {
-                const userId = userIds[Math.floor(Math.random() * userIds.length)];
-                yield axios_1.default.patch(`http://localhost:8000/LikeComment/${userId}/${commentId}`);
+            for (let i = 0; i < 4; i++) {
+                const userName = users_json_1.default[Math.floor(Math.random() * users_json_1.default.length)].username;
+                yield axios_1.default.patch(`http://localhost:8000/LikeComment/${userName}/${commentId}`);
             }
         }
     });

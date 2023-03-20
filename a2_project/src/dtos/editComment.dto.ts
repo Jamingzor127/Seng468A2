@@ -1,5 +1,5 @@
 export class editCommentDto {
-    userId: string;
+    userName: string;
     commentId: string;
     content: string;
 }
