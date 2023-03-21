@@ -10,7 +10,7 @@ async function main() {
     console.log("Starting Seed...")
     console.log("Creating Users...")
     for(const user of userData) {
-        await axios.post('http://localhost:8000/CreateUser', user);
+        await axios.post('http://localhost:5001/CreateUser', user);
     }
 
     //Assign Friends
@@ -24,7 +24,7 @@ async function main() {
             }
         }
         for(const friend of friends) {
-            await axios.patch(`http://localhost:8000/AddFriend/${user.username}/${friend}`);
+            await axios.patch(`http://localhost:5001/AddFriend/${user.username}/${friend}`);
         };
     }
 
@@ -32,26 +32,26 @@ async function main() {
     console.log("Creating Posts...")
     for(const post of postData) {
         const userName = userData[Math.floor(Math.random() * userData.length)].username;
-        await axios.post(`http://localhost:8000/CreatePost`, {...post, userName});
+        await axios.post(`http://localhost:5001/CreatePost`, {...post, userName});
     }
-    const postIds = (await axios.get('http://localhost:8000/PostIds')).data;
+    const postIds = (await axios.get('http://localhost:5001/PostIds')).data;
 
     //Create Comments
     console.log("Creating Comments...")
     for(const comment of commentData) {
         const userName = userData[Math.floor(Math.random() * userData.length)].username;
         const postId = postIds[Math.floor(Math.random() * postIds.length)];
-        await axios.post(`http://localhost:8000/CreateComment`, {...comment, userName, postId});
+        await axios.post(`http://localhost:5001/CreateComment`, {...comment, userName, postId});
     }
 
-    const commentIds = (await axios.get('http://localhost:8000/CommentIds')).data;
+    const commentIds = (await axios.get('http://localhost:5001/CommentIds')).data;
 
     //Like Posts
     console.log("Liking Posts and Comments...")
     for(const postId of postIds) {
         for(let i = 0; i < 2; i++) {
             const userName = userData[Math.floor(Math.random() * userData.length)].username;
-            await axios.patch(`http://localhost:8000/LikePost/${userName}/${postId}`);
+            await axios.patch(`http://localhost:5001/LikePost/${userName}/${postId}`);
         }
     }
 
@@ -59,7 +59,7 @@ async function main() {
     for(const commentId of commentIds) {
         for(let i = 0; i < 4; i++) {
             const userName = userData[Math.floor(Math.random() * userData.length)].username;
-            await axios.patch(`http://localhost:8000/LikeComment/${userName}/${commentId}`);
+            await axios.patch(`http://localhost:5001/LikeComment/${userName}/${commentId}`);
         }
     }
 

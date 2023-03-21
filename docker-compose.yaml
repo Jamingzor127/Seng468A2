@@ -1,0 +1,84 @@
+version: '3.5'
+
+networks:
+  servers:
+  databases:
+
+services:
+  nginx:
+    build:
+      context: ./nginx_load_balancer/
+      dockerfile: nginx_dockerfile
+    depends_on:
+      - mongo
+      - redis
+      - social-media-api-1
+      - social-media-api-2
+      - social-media-api-3
+    ports:
+      - "127.0.0.1:5001:5001"
+    restart: always
+    networks:
+      - servers
+
+  mongo:
+    container_name: mongo
+    image: mongo:3.5
+    restart: always
+    environment:
+       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    ports:
+      - 127.0.0.1:${MONGO_PORT}:27017
+    networks: 
+      - databases
+
+  redis:
+    container_name: redis
+    image: redis:7.0.4-alpine
+    restart: always
+    ports:
+      - 127.0.0.1:${REDIS_PORT}:6379
+    command: redis-server --loglevel warning
+    networks: 
+      - databases
+
+  social-media-api-1:
+    container_name: social-media-api-1
+    image: nestjs-api
+    build: ./a2_project
+    env_file:
+    - .env
+    depends_on:
+      - mongo
+      - redis
+    networks: 
+      - databases
+      - servers
+  social-media-api-2:
+    container_name: social-media-api-2
+    image: nestjs-api
+    build: ./a2_project
+    env_file:
+    - .env
+    depends_on:
+      - mongo
+      - redis
+    networks: 
+      - databases
+      - servers
+  social-media-api-3:
+    container_name: social-media-api-3
+    image: nestjs-api
+    build: ./a2_project
+    env_file:
+    - .env
+    depends_on:
+      - mongo
+      - redis
+    networks: 
+      - databases
+      - servers
+volumes:
+  redis:
+    driver: local

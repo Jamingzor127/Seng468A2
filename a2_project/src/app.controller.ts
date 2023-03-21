@@ -9,10 +9,16 @@ import { GetUserReportDto } from './dtos/getUserReport.dto';
 import { CommentEntity } from './entities/comment.entity';
 import { PostEntity } from './entities/post.entity';
 import { UserEntity } from './entities/user.entity';
+import * as os from 'os';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
+
+  @Get('/')
+  getId(): string {
+    return os.hostname();
+  }
 
   @Get('UserIds')
   getUserIds(): Promise<string[]> {

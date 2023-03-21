@@ -21,7 +21,7 @@ function main() {
         console.log("Starting Seed...");
         console.log("Creating Users...");
         for (const user of users_json_1.default) {
-            yield axios_1.default.post('http://localhost:8000/CreateUser', user);
+            yield axios_1.default.post('http://localhost:5001/CreateUser', user);
         }
         //Assign Friends
         console.log("Assigning Friends...");
@@ -34,7 +34,7 @@ function main() {
                 }
             }
             for (const friend of friends) {
-                yield axios_1.default.patch(`http://localhost:8000/AddFriend/${user.username}/${friend}`);
+                yield axios_1.default.patch(`http://localhost:5001/AddFriend/${user.username}/${friend}`);
             }
             ;
         }
@@ -42,30 +42,30 @@ function main() {
         console.log("Creating Posts...");
         for (const post of post_json_1.default) {
             const userName = users_json_1.default[Math.floor(Math.random() * users_json_1.default.length)].username;
-            yield axios_1.default.post(`http://localhost:8000/CreatePost`, Object.assign(Object.assign({}, post), { userName }));
+            yield axios_1.default.post(`http://localhost:5001/CreatePost`, Object.assign(Object.assign({}, post), { userName }));
         }
-        const postIds = (yield axios_1.default.get('http://localhost:8000/PostIds')).data;
+        const postIds = (yield axios_1.default.get('http://localhost:5001/PostIds')).data;
         //Create Comments
         console.log("Creating Comments...");
         for (const comment of comment_json_1.default) {
             const userName = users_json_1.default[Math.floor(Math.random() * users_json_1.default.length)].username;
             const postId = postIds[Math.floor(Math.random() * postIds.length)];
-            yield axios_1.default.post(`http://localhost:8000/CreateComment`, Object.assign(Object.assign({}, comment), { userName, postId }));
+            yield axios_1.default.post(`http://localhost:5001/CreateComment`, Object.assign(Object.assign({}, comment), { userName, postId }));
         }
-        const commentIds = (yield axios_1.default.get('http://localhost:8000/CommentIds')).data;
+        const commentIds = (yield axios_1.default.get('http://localhost:5001/CommentIds')).data;
         //Like Posts
         console.log("Liking Posts and Comments...");
         for (const postId of postIds) {
             for (let i = 0; i < 2; i++) {
                 const userName = users_json_1.default[Math.floor(Math.random() * users_json_1.default.length)].username;
-                yield axios_1.default.patch(`http://localhost:8000/LikePost/${userName}/${postId}`);
+                yield axios_1.default.patch(`http://localhost:5001/LikePost/${userName}/${postId}`);
             }
         }
         //Like Comments
         for (const commentId of commentIds) {
             for (let i = 0; i < 4; i++) {
                 const userName = users_json_1.default[Math.floor(Math.random() * users_json_1.default.length)].username;
-                yield axios_1.default.patch(`http://localhost:8000/LikeComment/${userName}/${commentId}`);
+                yield axios_1.default.patch(`http://localhost:5001/LikeComment/${userName}/${commentId}`);
             }
         }
     });
