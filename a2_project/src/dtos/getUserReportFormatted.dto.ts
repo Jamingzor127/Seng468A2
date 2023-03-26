@@ -1,9 +1,6 @@
-import { PostEntity } from "../entities/post.entity";
-import { CommentEntity } from "../entities/comment.entity";
-import { UserEntity } from "src/entities/user.entity";
 import { ApiProperty } from "@nestjs/swagger";
 
-export class GetUserReportDto {
+export class GetUserReportFormattedDto {
     @ApiProperty()
     username: string;
     @ApiProperty()
@@ -15,13 +12,15 @@ export class GetUserReportDto {
     @ApiProperty()
     dateOfBirth: string;
     @ApiProperty()
-    friends: UserEntity[];
+    friendsCount: number;
     @ApiProperty()
-    posts: PostEntity[];
+    friendsUserNames: string[];
     @ApiProperty()
-    likedPosts: PostEntity[];
+    postsCount: number;
     @ApiProperty()
-    comments: CommentEntity[];
+    likedPostsCount: number;
     @ApiProperty()
-    likedComments: CommentEntity[];
+    commentsCount:number;
+    @ApiProperty()
+    likedCommentsCount: number;
 }

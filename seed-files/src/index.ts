@@ -63,6 +63,15 @@ async function main() {
         }
     }
 
+    console.log("Getting Formatted User Reports...")
+    fs.mkdirSync(path.join(__dirname, 'reports'));
+    for(const user of userData) {
+        const report = (await axios.get(`http://localhost:5001/UserReportFormatted/${user.username}`)).data;
+        const fileName = path.join(__dirname, 'reports', `${user.username}.json`);
+        fs.writeFileSync(fileName, JSON.stringify(report, null, 2));
+    }
+
+
 
 
 }

@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12,6 +35,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(require("fs"));
+const path_1 = __importDefault(require("path"));
 const axios_1 = __importDefault(require("axios"));
 const users_json_1 = __importDefault(require("./data/users.json"));
 const post_json_1 = __importDefault(require("./data/post.json"));
@@ -67,6 +92,13 @@ function main() {
                 const userName = users_json_1.default[Math.floor(Math.random() * users_json_1.default.length)].username;
                 yield axios_1.default.patch(`http://localhost:5001/LikeComment/${userName}/${commentId}`);
             }
+        }
+        console.log("Getting Formatted User Reports...");
+        fs.mkdirSync(path_1.default.join(__dirname, 'reports'));
+        for (const user of users_json_1.default) {
+            const report = (yield axios_1.default.get(`http://localhost:5001/UserReportFormatted/${user.username}`)).data;
+            const fileName = path_1.default.join(__dirname, 'reports', `${user.username}.json`);
+            fs.writeFileSync(fileName, JSON.stringify(report, null, 2));
         }
     });
 }

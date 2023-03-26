@@ -10,6 +10,10 @@ import { CommentEntity } from './entities/comment.entity';
 import { PostEntity } from './entities/post.entity';
 import { UserEntity } from './entities/user.entity';
 import * as os from 'os';
+import { GetUserReportFormattedDto } from './dtos/getUserReportFormatted.dto';
+import { sendMessageDto } from './dtos/sendMessage.dto';
+import { ApiBody, ApiProperty } from '@nestjs/swagger';
+import { testKafkaDto } from './dtos/testKafka.dto';
 
 @Controller()
 export class AppController {
@@ -25,7 +29,13 @@ export class AppController {
     return this.appService.getUserIds();
   }
 
+  @Get("Usernames")
+  getUsernames(): Promise<string[]> {
+    return this.appService.getUsernames();
+  }
+
   @Post('CreateUser')
+  @ApiBody({type: createUserDto})
   createUser(@Body() user: createUserDto): Promise<boolean> {
     return this.appService.createUser(user);
   }
@@ -56,6 +66,7 @@ export class AppController {
   }
 
   @Post('CreateComment')
+  @ApiBody({type: createCommentDto})
   createComment(@Body() comment: createCommentDto): Promise<boolean> {
     return this.appService.addComment(comment.userName, comment.content, comment.postId);
   }
@@ -111,6 +122,7 @@ export class AppController {
   }
 
   @Post('CreatePost')
+  @ApiBody({type: createPostDto})
   createPost(@Body() post: createPostDto): Promise<boolean> {
     return this.appService.createPost(post.userName, post.title, post.content);
   }
@@ -161,4 +173,20 @@ export class AppController {
     return this.appService.getUserReports(username);
   }
 
+  @Get(('UserReportFormatted/:username'))
+  getUserReportFormatted(@Param('username') username: string): Promise<GetUserReportFormattedDto> {
+    return this.appService.getUserReportsFormatted(username);
+  }
+
+  @Post('SendMessage')
+  @ApiBody({type: sendMessageDto})
+  sendMessage(@Body() message: sendMessageDto): Promise<boolean> {
+    return this.appService.sendMessage(message.userNameSender, message.userNameReceiver, message.message);
+  }
+
+  @Post('TestKafka')
+  @ApiBody({type: testKafkaDto})
+  testKafka(@Body() message: testKafkaDto): Promise<boolean> {
+    return this.appService.kafkaTest(message.message);
+  }
 }

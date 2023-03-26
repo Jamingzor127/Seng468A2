@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import {ObjectId} from 'mongodb';
 import * as redis from 'redis';
 import { createUserDto } from './dtos/createUser.dto';
@@ -9,6 +9,8 @@ import { NotificationsDocument, NotificationsEntity } from './entities/notificat
 import { GetUserReportDto } from './dtos/getUserReport.dto';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
+import { GetUserReportFormattedDto } from './dtos/getUserReportFormatted.dto';
+import { ClientKafka } from '@nestjs/microservices';
 require('dotenv').config();
 
 @Injectable()
@@ -16,7 +18,8 @@ export class AppService implements OnModuleInit {
   constructor(@InjectModel('Users') private userModel: Model<UserDocument>,
               @InjectModel('Posts') private postModel: Model<PostDocument>,
               @InjectModel('Comments') private commentModel: Model<CommentDocument>,
-              @InjectModel('Notifications') private notificationsModel: Model<NotificationsDocument>,) {
+              @InjectModel('Notifications') private notificationsModel: Model<NotificationsDocument>,
+              @Inject('Kafka') private kafkaClient: ClientKafka) {
 
   }
   redisClient;
@@ -24,12 +27,19 @@ export class AppService implements OnModuleInit {
   async onModuleInit() {
     this.redisClient = redis.createClient({url: `redis://${process.env.REDIS_URL}:${process.env.REDIS_PORT}/0`});
     await this.redisClient.connect();
+    await this.kafkaClient.connect();
   }
 
   async getUserIds(): Promise<string[]> {
     const users = await this.userModel.find({}, {_id: true}).exec();
     return users.map((user) => user._id.toString());
   }
+
+  async getUsernames(): Promise<string[]> {
+    const users = await this.userModel.find({}, {username: true}).exec();
+    return users.map((user) => user.username);
+  }
+  
 
   async createUser(user: createUserDto): Promise<boolean> {
     const findUser = await this.userModel.findOne({email: user.email, username: user.username}).exec();
@@ -58,6 +68,7 @@ export class AppService implements OnModuleInit {
 
     await findUser1.save();
     await findUser2.save();
+    await this.createNotification(friendName, `${userName} added you as a friend!`);
     return true;
   }
 
@@ -69,6 +80,7 @@ export class AppService implements OnModuleInit {
     findUser2.friendList = findUser2.friendList.filter((friend) => friend.username !== userName);
     await findUser1.save();
     await findUser2.save();
+    await this.createNotification(friendName, `${userName} removed you as a friend!`);
     return true;
   }
 
@@ -111,6 +123,8 @@ export class AppService implements OnModuleInit {
     newComment.usersLiked = [];
     newComment.numberOfLikes = 0;
     await newComment.save();
+    const post = await this.getPost(postId);
+    await this.createNotification(post.user.username, `${userName} commented on your post!`);
     return true;
   }
 
@@ -120,6 +134,7 @@ export class AppService implements OnModuleInit {
     if(!findComment) return false;
     if(findComment.user.username !== userName) return false;
     await this.commentModel.deleteOne({_id: ObjectIdComment});
+    await this.createNotification(findComment.post.user.username, `${userName} removed their comment from your post!`);
     return true;
   }
 
@@ -131,6 +146,7 @@ export class AppService implements OnModuleInit {
     findComment.comment = comment;
     findComment.lastUpdateDate = new Date();
     await this.commentModel.findOneAndUpdate({_id: ObjectIdComment}, {$set: findComment}).exec();
+    await this.createNotification(findComment.post.user.username, `${userName} edited their comment on your post!`);
     return true;
   }
 
@@ -144,6 +160,7 @@ export class AppService implements OnModuleInit {
     comment.usersLiked.push(user);
     comment.numberOfLikes++;
     await this.commentModel.findOneAndUpdate({_id: ObjectIdComment}, {$set: comment}).exec();
+    await this.createNotification(comment.user.username, `${userName} liked your comment!`);
     return true;
   }
 
@@ -156,6 +173,7 @@ export class AppService implements OnModuleInit {
     comment.usersLiked = comment.usersLiked.filter((user) => user.username !== userName);
     comment.numberOfLikes--;
     await this.commentModel.findOneAndUpdate({_id: ObjectIdComment}, {$set: comment}).exec();
+    await this.createNotification(comment.user.username, `${userName} unliked your comment!`);
     return true;
   }
 
@@ -285,6 +303,7 @@ export class AppService implements OnModuleInit {
     findPost.usersLiked.push(user);
     findPost.numberOfLikes++;
     await this.postModel.findOneAndUpdate({_id: ObjectIdPost}, {$set: findPost}).exec();
+    await this.createNotification(findPost.user.username, `${userName} liked your post!`);
     return true;
   }
 
@@ -297,6 +316,7 @@ export class AppService implements OnModuleInit {
     findPost.usersLiked = findPost.usersLiked.filter((user) => user.username !== userName);
     findPost.numberOfLikes--;
     await this.postModel.findOneAndUpdate({_id: ObjectIdPost}, findPost).exec();
+    await this.createNotification(findPost.user.username, `${userName} unliked your post!`);
     return true;
   }
 
@@ -338,12 +358,13 @@ export class AppService implements OnModuleInit {
     return post;
   }
 
-  async createNotification(notification: string, userName: string) {
+  async createNotification(userName: string, notification: string) {
     const user = await this.getUser(userName);
-    const newNotification = await this.postModel.create({notification, user});
+    const newNotification = await this.notificationsModel.create({notification, user});
     newNotification.creationDate = new Date();
     newNotification.lastUpdateDate = new Date();
     await newNotification.save();
+    await this.sendNotification(userName, notification);
     return true;
   }
 
@@ -373,6 +394,11 @@ export class AppService implements OnModuleInit {
     return notification;
   }
 
+  async sendNotification(userNameReceiver: string, notification: string) {
+    this.kafkaClient.emit(`notification-${userNameReceiver}`, {userNameReceiver, notification});
+    return true;
+  }
+
   async getUserReports(userName: string): Promise<GetUserReportDto> {
     const User = await this.getUser(userName);
     if(!User) return null;
@@ -388,6 +414,7 @@ export class AppService implements OnModuleInit {
       lastName: User.lastName,
       email: User.email,
       dateOfBirth: User.dateOfBirth,
+      friends: User.friendList,
       posts: posts,
       likedPosts: likedPosts,
       comments: comments,
@@ -398,6 +425,36 @@ export class AppService implements OnModuleInit {
 
   }
 
+  async getUserReportsFormatted(userName: string): Promise<GetUserReportFormattedDto> {
+    const userReport = await this.getUserReports(userName);
+    if(!userReport) return null;
+    const userReportFormatted: GetUserReportFormattedDto = {
+      username: userReport.username,
+      firstName: userReport.firstName,
+      lastName: userReport.lastName,
+      email: userReport.email,
+      dateOfBirth: userReport.dateOfBirth,
+      friendsCount: userReport.friends.length,
+      friendsUserNames: userReport.friends.map(e => e.username),
+      postsCount: userReport.posts.length,
+      likedPostsCount: userReport.likedPosts.length,
+      commentsCount: userReport.comments.length,
+      likedCommentsCount: userReport.likedComments.length, 
+    }
 
+    return userReportFormatted;
+  }
+
+  async sendMessage(userNameSender: string, userNameReceiver: string, message: string) {
+    this.kafkaClient.emit(`message-${userNameReceiver}`, {userNameSender, userNameReceiver, message});
+    return true;
+  }
+
+  async kafkaTest(string: string) {
+    this.kafkaClient.emit(`test`, {string});
+    return true;
+  }
+
+  
 
 }
