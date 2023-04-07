@@ -103,4 +103,4 @@ There is a directory called `seed-files` in this project. It is in here you are 
 
 # Test Client Consumer
 
-The test client consumer subscribes to the user `zcnFjK`'s message and notification topics. This can be run by using `npm run start` which will connet to kafka and subscribe to the given topics (node_modules and dist are already built for you, you will need node to run this though). If you start the consumer, then run the seed script, you will see the messages from kafka come through on the terminal logs. 
+The test client consumer subscribes to the user `zcnFjK`'s message and notification topics. This can be run by using `npm install` to install the node modules and then run `npm run start` which will connet to kafka and subscribe to the given topics (dist is already built for you, you will need node to run this though). If you start the consumer, then run the seed script, you will see the messages from kafka come through on the terminal logs. 
