@@ -1,5 +1,5 @@
 # General
-To set up the nginx server, the three apis, redis, mongo, and kafka. You simply have to run `docker-compose up` from the root of this project. This will automatically build and start all necessary services. The nginx server runs on `localhost:5001`, mongo runs on `localhost:27017`, and the kafka UI runs on `localhost:8080`. The kafka UI can be used to see the current state of the Kafka cluster. The only other port that is exposed by the system is the actual Kafka instance which runs on `localhost:9092`.
+To set up the nginx server, the three apis, redis, mongo, and kafka. You simply have to run `docker-compose up` from the root of this project. This will automatically build and start all necessary services. The nginx server runs on `localhost:5001`, mongo runs on `localhost:27017`, and the kafka UI runs on `localhost:8080`. The kafka UI can be used to see the current state of the Kafka cluster. The only other port that is exposed by the system is the actual Kafka instance which runs on `localhost:9092` for the producers, and `localhost:9093` for the consumers.
 
 # API
 
@@ -102,3 +102,5 @@ and sends that message to kafka on the test topic. Just for testing purposes.
 There is a directory called `seed-files` in this project. It is in here you are able to run commands to generate data for the database. This script hits the apis to create all the necessary data. To run this, simply navigate to the `seed-files` directory and run `npm run seed` (node_modules and dist are already built for you, you will need node to run this though). This will generate all the data and return user reports for each user into `<root>/seed-files/dist/reports` in a json format. 
 
 # Test Client Consumer
+
+The test client consumer subscribes to the user `zcnFjK`'s message and notification topics. This can be run by using `npm run start` which will connet to kafka and subscribe to the given topics (node_modules and dist are already built for you, you will need node to run this though). If you start the consumer, then run the seed script, you will see the messages from kafka come through on the terminal logs. 

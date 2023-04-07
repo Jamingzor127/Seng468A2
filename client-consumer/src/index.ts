@@ -1,7 +1,7 @@
 import { Kafka } from "kafkajs"
 
 
-const consumer = new Kafka({brokers: ["127.0.0.1:9092"]}).consumer({groupId: "client-test-group"})
+const consumer = new Kafka({brokers: ["127.0.0.1:9093"]}).consumer({groupId: "client-test-group"})
 
 async function main() {
     console.log("Kafka Client Started")
